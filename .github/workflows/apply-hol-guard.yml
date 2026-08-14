@@ -1,0 +1,52 @@
+name: Apply HOL Guard catalog edit
+
+on:
+  push:
+    branches:
+      - add-hol-guard-mcp
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch without third-party actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          git fetch --depth=1 origin "${BRANCH}"
+          git checkout -B "${BRANCH}" FETCH_HEAD
+
+      - name: Add HOL Guard and self-delete
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          entry = "- [hashgraph-online/hol-guard](https://github.com/hashgraph-online/hol-guard) 🐍 🏠 🍎 🪟 🐧 - Local security layer for AI agents with a stdio MCP server for Guard status, inventory, receipts, and policy workflows; also protects MCP, skills, plugins, packages, and tool calls at runtime."
+          if entry not in text:
+              heading = '### 🔒 <a name="security"></a>Security\n'
+              pos = text.find(heading)
+              if pos < 0:
+                  raise SystemExit("Security section heading not found")
+              insert_at = pos + len(heading)
+              if text[insert_at:insert_at + 1] == "\n":
+                  insert_at += 1
+              text = text[:insert_at] + entry + "\n" + text[insert_at:]
+              path.write_text(text, encoding="utf-8")
+          Path(".github/workflows/apply-hol-guard.yml").unlink()
+          PY
+          git config user.name "kantorcodes"
+          git config user.email "6068672+kantorcodes@users.noreply.github.com"
+          git add README.md .github/workflows/apply-hol-guard.yml
+          git commit -m "Add HOL Guard MCP server"
+          git push origin HEAD:add-hol-guard-mcp
