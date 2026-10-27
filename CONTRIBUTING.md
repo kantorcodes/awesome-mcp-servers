@@ -47,6 +47,7 @@ This list is for servers with a public GitHub repository — something you insta
 * **Keep it consistent:** Follow the existing format and style of the `README.md` file.  This includes formatting, capitalization, and punctuation.
 * **Alphabetical order:**  Maintain alphabetical order within each category of servers.  This makes it easier to find specific servers.
 * **Accurate information:** Ensure that all information is accurate and up-to-date.  Double-check links and descriptions before submitting your changes.
+* **Avoid security claims based only on tool annotations:** Values such as `readOnlyHint` and `destructiveHint` are server-provided hints, not access controls. For safety or permission claims, check the server's documented enforcement and the [MCP tools specification](https://modelcontextprotocol.io/specification/2026-07-28/server/tools), which requires clients to treat annotations from untrusted servers as untrusted.
 * **One server per line:** List each server on a separate line for better readability.
 * **Clear descriptions:** Write concise and informative descriptions for each server.  Explain what the server does and what its key features are.
 
